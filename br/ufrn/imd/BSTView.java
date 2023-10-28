@@ -24,6 +24,7 @@ public class BSTView {
         tree.insert(4);
         tree.insert(2);
         tree.insert(1);
+
         System.out.println("Árvore com nós a mais:");
         tree.imprimeArvore(1); // Formato 1
         tree.imprimeArvore(2); // Formato 2
@@ -31,6 +32,14 @@ public class BSTView {
         System.out.println();
 
 
+        System.out.println("Árvore com nós a mais:");
+        tree.imprimeArvore(1); // Formato 1
+        tree.imprimeArvore(2); // Formato 2
+        System.out.println();
+        System.out.println();
+
+        System.out.println(tree.enesimoElemento(3));
+        System.out.println(tree.posicao(10));
 
     }
 }

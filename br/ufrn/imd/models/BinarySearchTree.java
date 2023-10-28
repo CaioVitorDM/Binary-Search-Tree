@@ -165,4 +165,71 @@ public class BinarySearchTree {
     }
 
 
+    public int enesimoElemento(int n) {
+        //Checa se o valor enesimo passado está dentro do intervalo da árvore
+        if (n < 1 || n > countNodes(root)) {
+            System.out.println("Provide a number in the correct interval.");
+            return -1;
+        }
+        return enesimoElementoRec(root, n);
+    }
+
+    //Função auxiliar que conta a quantidade de elementos na árvore
+    private int countNodes(Node node) {
+        if (node == null) {
+            return 0;
+        }
+        return 1 + node.getSizeLeft() + node.getSizeRight();
+    }
+
+    //Função que encontra o elemento na n-ésima posição
+    private int enesimoElementoRec(Node node, int n) {
+        int nodesNaEsquerda = node.getSizeLeft() + 1; // Contagem de nós na subárvore esquerda + o próprio nó
+
+        if (n == nodesNaEsquerda) {
+            return node.getValue(); // Encontramos o n-ésimo elemento
+        } else if (n < nodesNaEsquerda) {
+            return enesimoElementoRec(node.getLeft(), n); // O n-ésimo elemento está na subárvore esquerda
+        } else {
+            return enesimoElementoRec(node.getRight(), n - nodesNaEsquerda); // O n-ésimo elemento está na subárvore direita
+        }
+    }
+
+    public int posicao(int x) {
+        int position = posicaoRec(root, x);
+        if(position == -1){
+            System.out.println("Element not found");
+            return position;
+        }
+        return position;
+    }
+
+    private int posicaoRec(Node node, int x) {
+        if (node == null) {
+            return -1; // O Elemento não foi encontrado na árvore
+        }
+
+        int posicaoEsquerda = posicaoRec(node.getLeft(), x); // Chamada recursiva para o nó à esquerda
+
+        if (posicaoEsquerda != -1) {
+            return posicaoEsquerda; // Retorna a posição da subárvore esquerda se o elemento for encontrado
+        }
+
+        if (node.getValue() == x) {
+            int posicaoSubarvoreEsquerda = node.getSizeLeft() + 1;
+            return posicaoSubarvoreEsquerda; // Retorna a posição na raiz se o elemento for encontrado
+        }
+
+        int posicaoDireita = posicaoRec(node.getRight(), x);
+
+        if (posicaoDireita != -1) {
+            int posicaoSubarvoreEsquerda = node.getSizeLeft() + 1;
+            return posicaoSubarvoreEsquerda + posicaoDireita; // Retorna a posição na subárvore direita se o elemento for encontrado
+        }
+
+        return -1; // Retorna -1 se o elemento não for encontrado na árvore
+    }
+
+
+
 }
