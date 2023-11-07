@@ -11,69 +11,67 @@ public class BinarySearchTree {
     }
 
     public void insert(int value) {
-        if(!search(value)){
-            root = insertRecursive(root, value);
-        }
-        else {
-            System.out.println(value + " insert error, value already exists.");
+        if (!search(value)) {
+            insertRecursive(root, value);
+            System.out.println(value + " inserido");
+        } else {
+            System.out.println(value + " já está na árvore, não pode ser inserido");
         }
     }
 
-    private Node insertRecursive(Node current, int value) {
+    private void insertRecursive(Node current, int value) {
         if (current == null) {
-            return new Node(value);
-        }
-
-        if (value < current.getValue()) {
-            current.setLeft(insertRecursive(current.getLeft(), value));
+            root = new Node(value);
+        } else if (value < current.getValue()) {
+            if (current.getLeft() == null) {
+                current.setLeft(new Node(value));
+                current.setSizeLeft(1);
+                return;
+            }
+            insertRecursive(current.getLeft(), value);
             current.setSizeLeft(current.getSizeLeft() + 1); // Atualiza o tamanho da subárvore à esquerda
         } else if (value > current.getValue()) {
-            current.setRight(insertRecursive(current.getRight(), value));
+            if (current.getRight() == null) {
+                current.setRight(new Node(value));
+                current.setSizeRight(1);
+                return;
+            }
+            insertRecursive(current.getRight(), value);
             current.setSizeRight(current.getSizeRight() + 1); // Atualiza o tamanho da subárvore à direita
         }
-        return current;
     }
 
     public void remove(int value) {
-        if(search(value)){
-            root = removeRecursive(root, value);
-        }
-        else {
-            System.out.println(value + " remove error, value not found.");
+        if (search(value)) {
+            removeRecursive(root, value);
+            System.out.println(value + " removido");
+        } else {
+            System.out.println(value + " não está na árvore, não pode ser removido");
         }
     }
+
 
     private Node removeRecursive(Node current, int value) {
         if (current == null) {
             return current;
         }
 
-        //Se o valor a ser removido é menor que o valor do nó atual, chama a função recursivamente para a subárvore à esquerda
         if (value < current.getValue()) {
             current.setLeft(removeRecursive(current.getLeft(), value));
             current.setSizeLeft(current.getLeft() != null ? current.getLeft().getSizeLeft() : 0);
-        }
-
-        //Se o valor a ser removido é maior que o valor do nó atual, chama a função recursivamente para a subárvore à direita.
-        else if (value > current.getValue()) {
+        } else if (value > current.getValue()) {
             current.setRight(removeRecursive(current.getRight(), value));
             current.setSizeRight(current.getRight() != null ? current.getRight().getSizeRight() : 0);
-        }
-        else {
-            //Se o nó atual não possui filhos à esquerda, substitui pelo nó à direita
+        } else {
             if (current.getLeft() == null) {
                 return current.getRight();
-            }
-            //Se o nó atual não possui filhos à direita, substitui pelo nó à esquerda.
-            else if (current.getRight() == null) {
+            } else if (current.getRight() == null) {
                 return current.getLeft();
             }
 
-            // Para um nó com dois filhos, encontra o sucessor in-order, ou seja, o nó com menor valor na subárvore à direita
             current.setValue(findMinValue(current.getRight()));
-            // Remove o nó sucessor da subárvore à direita
             current.setRight(removeRecursive(current.getRight(), current.getValue()));
-            //Seta o valor da subárvore à direita agora sem o nó sucessor
+            current.setSizeLeft(current.getLeft() != null ? current.getLeft().getSizeLeft() : 0);
             current.setSizeRight(current.getRight() != null ? current.getRight().getSizeRight() : 0);
         }
 
@@ -116,37 +114,24 @@ public class BinarySearchTree {
 
     public void imprimeArvore(int s) {
         if (s == 1) {
-            imprimeArvoreFormato1(root, "", true);
+            imprimeArvoreFormato1(root, 1);
         } else if (s == 2) {
             imprimeArvoreFormato2(root);
         }
     }
 
-    private void imprimeArvoreFormato1(Node node, String prefix, boolean isTail) {
-        //isTail serve para definir se é ou não o último na profundidade.
+    private void imprimeArvoreFormato1(Node node, int depth) {
         if (node != null) {
-            System.out.println(prefix + (isTail ? "└── " : "├── ") + node.getValue());
+            String nodeValue = String.valueOf(node.getValue());
+            String prefix = "\t".repeat(depth);
 
-            if (node.getLeft() != null || node.getRight() != null) {
+            System.out.println(prefix + nodeValue + "-".repeat(depth * 7)); // Ajuste o valor 5 para controlar o espaçamento entre os traços
 
-                // Se o nó tem ambos os filhos (esquerda e direita), imprime linhas para ambos
-                if (node.getLeft() != null && node.getRight() != null) {
-                    imprimeArvoreFormato1(node.getLeft(), prefix + (isTail ? "    " : "│   "), false); // Chama a função recursivamente para o nó à esquerda com prefixo não final
-                    imprimeArvoreFormato1(node.getRight(), prefix + (isTail ? "    " : "│   "), true); // Chama a função recursivamente para o nó à direita com prefixo final
-                }
-
-                // Se o nó tem apenas o filho à esquerda, imprime linha para a esquerda
-                else if (node.getLeft() != null) {
-                    imprimeArvoreFormato1(node.getLeft(), prefix + (isTail ? "    " : "│   "), true);
-                }
-
-                // Se o nó tem apenas o filho à direita, imprime linha para a direita
-                else {
-                    imprimeArvoreFormato1(node.getRight(), prefix + (isTail ? "    " : "│   "), true);
-                }
-            }
+            imprimeArvoreFormato1(node.getLeft(), depth + 1);
+            imprimeArvoreFormato1(node.getRight(), depth + 1);
         }
     }
+
 
     private void imprimeArvoreFormato2(Node node) {
         if (node == null) {
@@ -172,6 +157,10 @@ public class BinarySearchTree {
             return -1;
         }
         return enesimoElementoRec(root, n);
+    }
+
+    public int returnCountNodes(){
+        return countNodes(root);
     }
 
     //Função auxiliar que conta a quantidade de elementos na árvore
@@ -230,6 +219,30 @@ public class BinarySearchTree {
         return -1; // Retorna -1 se o elemento não for encontrado na árvore
     }
 
+    public int mediana() {
+        int totalNodes = countNodes(root);
+        System.out.println("quantiade de nos: " + totalNodes);
+
+        // Verifica se o número total de nós é par ou ímpar
+        if (totalNodes % 2 == 1) {
+            // Se for ímpar, a mediana está em um único nó
+            int medianPosition = (totalNodes + 1) / 2;
+            return enesimoElementoRec(root, medianPosition);
+        } else {
+            // Se for par, a mediana é a média dos dois elementos do meio
+            int medianPosition1 = totalNodes / 2;
+            int medianPosition2 = totalNodes / 2 + 1;
+            int medianValue1 = enesimoElementoRec(root, medianPosition1);
+            int medianValue2 = enesimoElementoRec(root, medianPosition2);
+            return Math.min(medianValue1, medianValue2);
+        }
+    }
+
+
+
+
 
 
 }
+
+

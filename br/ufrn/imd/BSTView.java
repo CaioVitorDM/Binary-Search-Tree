@@ -39,7 +39,12 @@ public class BSTView {
         System.out.println();
 
         System.out.println(tree.enesimoElemento(3));
-        System.out.println(tree.posicao(10));
+        System.out.println(tree.posicao(8));
+        System.out.println(tree.mediana());
+        System.out.println(tree.returnCountNodes());
+        tree.remove(1);
+        System.out.println(tree.returnCountNodes());
+
 
     }
 }
