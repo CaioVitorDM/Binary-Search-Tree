@@ -2,6 +2,7 @@ package br.ufrn.imd.models;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Comparator;
 
 public class BinarySearchTree {
     Node root;
@@ -10,46 +11,120 @@ public class BinarySearchTree {
         this.root = null; // Inicializa a árvore como vazia
     }
 
-    public void insert(int value) {
-        if (!search(value)) {
-            insertRecursive(root, value);
-            System.out.println(value + " inserido");
-        } else {
-            System.out.println(value + " já está na árvore, não pode ser inserido");
+    public void buildTree(ArrayList<Integer> values) {
+        if (values.size() > 0) {
+            // Ordena o ArrayList
+            values.sort(Comparator.naturalOrder());
+
+            // Encontrar o valor do meio após a ordenação
+            int middleIndex = values.size() / 2;
+            int middleValue = values.get(middleIndex);
+
+            // Dividir o ArrayList em dois subconjuntos
+            ArrayList<Integer> leftValues = new ArrayList<>(values.subList(0, middleIndex));
+            ArrayList<Integer> rightValues = new ArrayList<>(values.subList(middleIndex + 1, values.size()));
+
+            // Inserir o valor do meio como raiz
+            insert(middleValue);
+
+            // Recursivamente construir as subárvores à esquerda e à direita
+            buildTree(leftValues);
+            buildTree(rightValues);
         }
     }
 
-    private void insertRecursive(Node current, int value) {
-        if (current == null) {
+
+    public void insert(int value) {
+        if (root == null) {
             root = new Node(value);
-        } else if (value < current.getValue()) {
-            if (current.getLeft() == null) {
-                current.setLeft(new Node(value));
-                current.setSizeLeft(1);
-                return;
+            System.out.println(value + " inserido como raiz");
+        } else {
+            if (!search(value)) {
+                root = insertRecursive(root, value);
+                System.out.println(value + " inserido");
+            } else {
+                System.out.println(value + " já está na árvore, não pode ser inserido");
             }
-            insertRecursive(current.getLeft(), value);
-            current.setSizeLeft(current.getSizeLeft() + 1); // Atualiza o tamanho da subárvore à esquerda
-        } else if (value > current.getValue()) {
-            if (current.getRight() == null) {
-                current.setRight(new Node(value));
-                current.setSizeRight(1);
-                return;
-            }
-            insertRecursive(current.getRight(), value);
-            current.setSizeRight(current.getSizeRight() + 1); // Atualiza o tamanho da subárvore à direita
         }
     }
+
+    private Node insertRecursive(Node current, int value) {
+        if (current == null) {
+            return new Node(value);
+        }
+
+        if (value < current.getValue()) {
+            current.setLeft(insertRecursive(current.getLeft(), value));
+        } else if (value > current.getValue()) {
+            current.setRight(insertRecursive(current.getRight(), value));
+        }
+
+        // Atualiza as alturas e verifica o balanceamento
+        updateHeightAndBalance(current);
+
+        // Realiza as rotações necessárias para reequilibrar a árvore
+        return balance(current);
+    }
+
+    private void updateHeightAndBalance(Node node) {
+        int leftHeight = (node.getLeft() == null) ? -1 : node.getLeft().getHeight();
+        int rightHeight = (node.getRight() == null) ? -1 : node.getRight().getHeight();
+
+        // Atualiza a altura do nó
+        node.setHeight(1 + Math.max(leftHeight, rightHeight));
+
+        // Atualiza o fator de balanceamento
+        node.setBalanceFactor(rightHeight - leftHeight);
+    }
+
+    private Node balance(Node node) {
+        // Realiza as rotações necessárias com base no fator de balanceamento
+        if (node.getBalanceFactor() < -1) {
+            if (node.getLeft().getBalanceFactor() > 0) {
+                node.setLeft(leftRotate(node.getLeft()));
+            }
+            return rightRotate(node);
+        } else if (node.getBalanceFactor() > 1) {
+            if (node.getRight().getBalanceFactor() < 0) {
+                node.setRight(rightRotate(node.getRight()));
+            }
+            return leftRotate(node);
+        }
+        return node;
+    }
+
+    private Node leftRotate(Node node) {
+        Node newRoot = node.getRight();
+        node.setRight(newRoot.getLeft());
+        newRoot.setLeft(node);
+
+        updateHeightAndBalance(node);
+        updateHeightAndBalance(newRoot);
+
+        return newRoot;
+    }
+
+    private Node rightRotate(Node node) {
+        Node newRoot = node.getLeft();
+        node.setLeft(newRoot.getRight());
+        newRoot.setRight(node);
+
+        updateHeightAndBalance(node);
+        updateHeightAndBalance(newRoot);
+
+        return newRoot;
+    }
+
+
 
     public void remove(int value) {
         if (search(value)) {
-            removeRecursive(root, value);
+            root = removeRecursive(root, value);
             System.out.println(value + " removido");
         } else {
             System.out.println(value + " não está na árvore, não pode ser removido");
         }
     }
-
 
     private Node removeRecursive(Node current, int value) {
         if (current == null) {
@@ -58,10 +133,10 @@ public class BinarySearchTree {
 
         if (value < current.getValue()) {
             current.setLeft(removeRecursive(current.getLeft(), value));
-            current.setSizeLeft(current.getLeft() != null ? current.getLeft().getSizeLeft() : 0);
+            current.setSizeLeft(current.getLeft() != null ? current.getLeft().getSizeLeft() + current.getLeft().getSizeRight() + 1 : 0);
         } else if (value > current.getValue()) {
             current.setRight(removeRecursive(current.getRight(), value));
-            current.setSizeRight(current.getRight() != null ? current.getRight().getSizeRight() : 0);
+            current.setSizeRight(current.getRight() != null ? current.getRight().getSizeLeft() + current.getRight().getSizeRight() + 1 : 0);
         } else {
             if (current.getLeft() == null) {
                 return current.getRight();
@@ -71,12 +146,13 @@ public class BinarySearchTree {
 
             current.setValue(findMinValue(current.getRight()));
             current.setRight(removeRecursive(current.getRight(), current.getValue()));
-            current.setSizeLeft(current.getLeft() != null ? current.getLeft().getSizeLeft() : 0);
-            current.setSizeRight(current.getRight() != null ? current.getRight().getSizeRight() : 0);
+            current.setSizeLeft(current.getLeft() != null ? current.getLeft().getSizeLeft() + current.getLeft().getSizeRight() + 1 : 0);
+            current.setSizeRight(current.getRight() != null ? current.getRight().getSizeLeft() + current.getRight().getSizeRight() + 1 : 0);
         }
 
         return current;
     }
+
 
     //Encontra o menor valor da subárvore passada
     private int findMinValue(Node root) {

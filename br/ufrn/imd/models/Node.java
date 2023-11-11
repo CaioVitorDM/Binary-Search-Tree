@@ -6,6 +6,8 @@ public class Node {
     private Node right;
     private int sizeLeft;
     private int sizeRight;
+    private int height;
+    private int balanceFactor;
 
     public Node(int value) {
         this.value = value;
@@ -51,5 +53,21 @@ public class Node {
 
     public void setSizeRight(int sizeRight) {
         this.sizeRight = sizeRight;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
+    }
+
+    public int getBalanceFactor() {
+        return balanceFactor;
+    }
+
+    public void setBalanceFactor(int balanceFactor) {
+        this.balanceFactor = balanceFactor;
     }
 }

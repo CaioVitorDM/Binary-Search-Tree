@@ -2,48 +2,45 @@ package br.ufrn.imd;
 
 import br.ufrn.imd.models.BinarySearchTree;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Scanner;
+
 public class BSTView {
+
     public static void main(String[] args) {
         BinarySearchTree tree = new BinarySearchTree();
 
-        // Montando a árvore
-        tree.insert(5);
-        tree.insert(3);
-        tree.insert(8);
+        try {
+            Scanner inputTreeValues = new Scanner(new File("br/ufrn/imd/Input/arquivo1.txt"));
+            ArrayList<Integer> values = new ArrayList<>();
 
-        // Imprimindo a árvore original
-        System.out.println("Árvore original:");
-        tree.imprimeArvore(1); // Formato 1
-        tree.imprimeArvore(2); // Formato 2
-        System.out.println();
-        System.out.println();
+            // Lê os valores e armazena em um ArrayList
+            while (inputTreeValues.hasNextInt()) {
+                int value = inputTreeValues.nextInt();
+                values.add(value);
+            }
+            inputTreeValues.close();
 
-        // Inserindo mais dois nós
-        tree.insert(6);
-        tree.insert(9);
-        tree.insert(4);
-        tree.insert(2);
-        tree.insert(1);
+            // Ordena o ArrayList
+            values.sort(Comparator.naturalOrder());
 
-        System.out.println("Árvore com nós a mais:");
-        tree.imprimeArvore(1); // Formato 1
-        tree.imprimeArvore(2); // Formato 2
-        System.out.println();
-        System.out.println();
+            tree.buildTree(values);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
 
-
-        System.out.println("Árvore com nós a mais:");
-        tree.imprimeArvore(1); // Formato 1
-        tree.imprimeArvore(2); // Formato 2
+        tree.imprimeArvore(1);
+        tree.imprimeArvore(2);
         System.out.println();
-        System.out.println();
-
-        System.out.println(tree.enesimoElemento(3));
-        System.out.println(tree.posicao(8));
+        tree.insert(36);
         System.out.println(tree.mediana());
-        System.out.println(tree.returnCountNodes());
-        tree.remove(1);
-        System.out.println(tree.returnCountNodes());
+        System.out.println();
+        tree.imprimeArvore(1);
+        tree.imprimeArvore(2);
+        
 
 
     }
