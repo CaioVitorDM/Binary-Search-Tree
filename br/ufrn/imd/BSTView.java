@@ -24,24 +24,76 @@ public class BSTView {
             }
             inputTreeValues.close();
 
-            // Ordena o ArrayList
-            values.sort(Comparator.naturalOrder());
+            for(int value: values){
+                tree.insert(value);
+            }
 
-            tree.buildTree(values);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
 
-        tree.imprimeArvore(1);
-        tree.imprimeArvore(2);
         System.out.println();
-        tree.insert(36);
-        System.out.println(tree.mediana());
-        System.out.println();
-        tree.imprimeArvore(1);
-        tree.imprimeArvore(2);
-        
 
+        try {
+            Scanner inputCommands = new Scanner(new File("br/ufrn/imd/Input/arquivo2.txt"));
+            while (inputCommands.hasNext()) {
+                String command = inputCommands.next();
+                switch (command) {
+                    case "CHEIA":
+                        tree.ehCheia();
+                        break;
+                    case "COMPLETA":
+                        tree.ehCompleta();
+                        break;
+                    case "ENESIMO":
+                        int n = inputCommands.nextInt();
+                        System.out.println("N-ésimo elemento: " + tree.enesimoElemento(n));
+                        break;
+                    case "INSIRA":
+                        int value = inputCommands.nextInt();
+                        tree.insert(value);
+                        break;
+                    case "PREORDEM":
+                        tree.preOrder();
+                        break;
+                    case "IMPRIMA":
+                        System.out.println();
+                        int format = inputCommands.nextInt();
+                        tree.imprimeArvore(format);
+                        System.out.println();
+                        break;
+                    case "REMOVA":
+                        int removeValue = inputCommands.nextInt();
+                        tree.remove(removeValue);
+                        break;
+                    case "POSICAO":
+                        int positionValue = inputCommands.nextInt();
+                        System.out.println("Posição de " + positionValue + ": " + tree.posicao(positionValue));
+                        break;
+                    case "MEDIANA":
+                        System.out.println("Mediana: " + tree.mediana());
+                        break;
+                    case "MEDIA":
+                        int mediaValue = inputCommands.nextInt();
+                        System.out.println("Média até " + mediaValue + ": " + tree.media(mediaValue));
+                        break;
+                    case "BUSCAR":
+                        int searchValue = inputCommands.nextInt();
+                        if (tree.search(searchValue)) {
+                            System.out.println("Chave encontrada");
+                        } else {
+                            System.out.println("Chave não encontrada");
+                        }
+                        break;
+                    default:
+                        System.out.println("Comando não reconhecido: " + command);
+                        break;
+                }
+            }
+            inputCommands.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
 
     }
 }

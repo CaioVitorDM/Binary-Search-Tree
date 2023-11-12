@@ -1,9 +1,5 @@
 package br.ufrn.imd.models;
 
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.Comparator;
-
 public class BinarySearchTree {
     Node root;
 
@@ -11,111 +7,36 @@ public class BinarySearchTree {
         this.root = null; // Inicializa a árvore como vazia
     }
 
-    public void buildTree(ArrayList<Integer> values) {
-        if (values.size() > 0) {
-            // Ordena o ArrayList
-            values.sort(Comparator.naturalOrder());
-
-            // Encontrar o valor do meio após a ordenação
-            int middleIndex = values.size() / 2;
-            int middleValue = values.get(middleIndex);
-
-            // Dividir o ArrayList em dois subconjuntos
-            ArrayList<Integer> leftValues = new ArrayList<>(values.subList(0, middleIndex));
-            ArrayList<Integer> rightValues = new ArrayList<>(values.subList(middleIndex + 1, values.size()));
-
-            // Inserir o valor do meio como raiz
-            insert(middleValue);
-
-            // Recursivamente construir as subárvores à esquerda e à direita
-            buildTree(leftValues);
-            buildTree(rightValues);
-        }
-    }
-
-
     public void insert(int value) {
-        if (root == null) {
-            root = new Node(value);
-            System.out.println(value + " inserido como raiz");
+        if (!search(value)) {
+            insertRecursive(root, value);
+            System.out.println(value + " inserido");
         } else {
-            if (!search(value)) {
-                root = insertRecursive(root, value);
-                System.out.println(value + " inserido");
-            } else {
-                System.out.println(value + " já está na árvore, não pode ser inserido");
-            }
+            System.out.println(value + " já está na árvore, não pode ser inserido");
         }
     }
 
-    private Node insertRecursive(Node current, int value) {
+    private void insertRecursive(Node current, int value) {
         if (current == null) {
-            return new Node(value);
-        }
-
-        if (value < current.getValue()) {
-            current.setLeft(insertRecursive(current.getLeft(), value));
+            root = new Node(value);
+        } else if (value < current.getValue()) {
+            if (current.getLeft() == null) {
+                current.setLeft(new Node(value));
+                current.setSizeLeft(1);
+                return;
+            }
+            insertRecursive(current.getLeft(), value);
+            current.setSizeLeft(current.getSizeLeft() + 1); // Atualiza o tamanho da subárvore à esquerda
         } else if (value > current.getValue()) {
-            current.setRight(insertRecursive(current.getRight(), value));
-        }
-
-        // Atualiza as alturas e verifica o balanceamento
-        updateHeightAndBalance(current);
-
-        // Realiza as rotações necessárias para reequilibrar a árvore
-        return balance(current);
-    }
-
-    private void updateHeightAndBalance(Node node) {
-        int leftHeight = (node.getLeft() == null) ? -1 : node.getLeft().getHeight();
-        int rightHeight = (node.getRight() == null) ? -1 : node.getRight().getHeight();
-
-        // Atualiza a altura do nó
-        node.setHeight(1 + Math.max(leftHeight, rightHeight));
-
-        // Atualiza o fator de balanceamento
-        node.setBalanceFactor(rightHeight - leftHeight);
-    }
-
-    private Node balance(Node node) {
-        // Realiza as rotações necessárias com base no fator de balanceamento
-        if (node.getBalanceFactor() < -1) {
-            if (node.getLeft().getBalanceFactor() > 0) {
-                node.setLeft(leftRotate(node.getLeft()));
+            if (current.getRight() == null) {
+                current.setRight(new Node(value));
+                current.setSizeRight(1);
+                return;
             }
-            return rightRotate(node);
-        } else if (node.getBalanceFactor() > 1) {
-            if (node.getRight().getBalanceFactor() < 0) {
-                node.setRight(rightRotate(node.getRight()));
-            }
-            return leftRotate(node);
+            insertRecursive(current.getRight(), value);
+            current.setSizeRight(current.getSizeRight() + 1); // Atualiza o tamanho da subárvore à direita
         }
-        return node;
     }
-
-    private Node leftRotate(Node node) {
-        Node newRoot = node.getRight();
-        node.setRight(newRoot.getLeft());
-        newRoot.setLeft(node);
-
-        updateHeightAndBalance(node);
-        updateHeightAndBalance(newRoot);
-
-        return newRoot;
-    }
-
-    private Node rightRotate(Node node) {
-        Node newRoot = node.getLeft();
-        node.setLeft(newRoot.getRight());
-        newRoot.setRight(node);
-
-        updateHeightAndBalance(node);
-        updateHeightAndBalance(newRoot);
-
-        return newRoot;
-    }
-
-
 
     public void remove(int value) {
         if (search(value)) {
@@ -152,7 +73,6 @@ public class BinarySearchTree {
 
         return current;
     }
-
 
     //Encontra o menor valor da subárvore passada
     private int findMinValue(Node root) {
@@ -235,10 +155,6 @@ public class BinarySearchTree {
         return enesimoElementoRec(root, n);
     }
 
-    public int returnCountNodes(){
-        return countNodes(root);
-    }
-
     //Função auxiliar que conta a quantidade de elementos na árvore
     private int countNodes(Node node) {
         if (node == null) {
@@ -297,7 +213,6 @@ public class BinarySearchTree {
 
     public int mediana() {
         int totalNodes = countNodes(root);
-        System.out.println("quantiade de nos: " + totalNodes);
 
         // Verifica se o número total de nós é par ou ímpar
         if (totalNodes % 2 == 1) {
@@ -314,11 +229,129 @@ public class BinarySearchTree {
         }
     }
 
+    public void preOrder(){
+        preOrdem(root);
+    }
 
+    public void preOrdem(Node node){
+        System.out.print(node.getValue() + " ");
+        if(node.getLeft() != null) preOrdem(node.getLeft());
+        if(node.getRight() != null) preOrdem(node.getRight());
+    }
 
+    public void ehCheia() {
+         if(ehCheiaRec(root)) {
+             System.out.println("A árvore é cheia");
+         }
+         else {
+             System.out.println("A árvore não é cheia");
+         }
+    }
+
+    private boolean ehCheiaRec(Node node) {
+        // Se a árvore está vazia, ela é considerada cheia
+        if (node == null) {
+            return true;
+        }
+
+        // Verifica se o nó tem ambos os filhos ou nenhum
+        if ((node.getLeft() == null && node.getRight() != null) || (node.getLeft() != null && node.getRight() == null)) {
+            return false;
+        }
+
+        // Chama a função recursivamente para os filhos
+        return ehCheiaRec(node.getLeft()) && ehCheiaRec(node.getRight());
+    }
+
+    public void ehCompleta() {
+        int altura = alturaArvore(root);
+        if(verificaCompleta(root, 0, altura)) {
+            System.out.println("A árvore é completa");
+        }
+        else {
+            System.out.println("A árvore não é completa");
+        }
+    }
+
+    private int alturaArvore(Node node) {
+        if (node == null) {
+            return 0;
+        } else {
+            int alturaEsquerda = alturaArvore(node.getLeft());
+            int alturaDireita = alturaArvore(node.getRight());
+            return Math.max(alturaEsquerda, alturaDireita) + 1;
+        }
+    }
+
+    // Função auxiliar para verificar se a árvore é completa
+    private boolean verificaCompleta(Node node, int nivelAtual, int alturaTotal) {
+        // Verifica se a árvore está vazia (considerada completa)
+        if (node == null) {
+            return true;
+        }
+
+        // Se um nó tem uma subárvore vazia, ela deve estar no último ou penúltimo nível
+        if ((node.getLeft() == null && node.getRight() != null) || (node.getLeft() != null && node.getRight() == null)) {
+            return nivelAtual == alturaTotal - 1 || nivelAtual == alturaTotal - 2;
+        }
+
+        // Chama recursivamente para os filhos
+        return verificaCompleta(node.getLeft(), nivelAtual + 1, alturaTotal)
+                && verificaCompleta(node.getRight(), nivelAtual + 1, alturaTotal);
+    }
+
+    public double media(int x) {
+        Node rootNode = searchNode(x);
+
+        if (rootNode != null) {
+            int[] result = new int[2];  // Índice 0: soma, Índice 1: número total de elementos
+            countElements(rootNode, result, 1);
+            result[1] = 0;
+            countElements(rootNode, result, 0);
+
+            if (result[1] != 0) {
+                return (double) result[0] / result[1];
+            } else {
+                System.out.println("ERROR: No elements found.");
+                return -1;
+            }
+        } else {
+            System.out.println("ERROR: Root invalid.");
+            return -1;
+        }
+    }
+
+    // Função auxiliar para contar elementos na árvore
+    private void countElements(Node node, int[] result, int flag) {
+        if (node != null) {
+            if (flag == 1) {
+                result[0] += node.getValue();
+            } else {
+                result[1]++;
+            }
+            countElements(node.getLeft(), result, flag);
+            countElements(node.getRight(), result, flag);
+        }
+    }
+
+    // Função auxiliar para encontrar o nó com o valor x na árvore
+    private Node searchNode(int value) {
+        return searchNodeRecursive(root, value);
+    }
+
+    private Node searchNodeRecursive(Node current, int value) {
+        if (current == null || current.getValue() == value) {
+            return current;
+        }
+
+        if (value < current.getValue()) {
+            return searchNodeRecursive(current.getLeft(), value);
+        } else {
+            return searchNodeRecursive(current.getRight(), value);
+        }
+    }
 
 
 
 }
-
 
