@@ -305,9 +305,7 @@ public class BinarySearchTree {
 
         if (rootNode != null) {
             int[] result = new int[2];  // Índice 0: soma, Índice 1: número total de elementos
-            countElements(rootNode, result, 1);
-            result[1] = 0;
-            countElements(rootNode, result, 0);
+            countElements(rootNode, result);
 
             if (result[1] != 0) {
                 return (double) result[0] / result[1];
@@ -322,17 +320,15 @@ public class BinarySearchTree {
     }
 
     // Função auxiliar para contar elementos na árvore
-    private void countElements(Node node, int[] result, int flag) {
+    private void countElements(Node node, int[] result) {
         if (node != null) {
-            if (flag == 1) {
-                result[0] += node.getValue();
-            } else {
-                result[1]++;
-            }
-            countElements(node.getLeft(), result, flag);
-            countElements(node.getRight(), result, flag);
+            result[0] += node.getValue();
+            result[1]++;
+            countElements(node.getLeft(), result);
+            countElements(node.getRight(), result);
         }
     }
+
 
     // Função auxiliar para encontrar o nó com o valor x na árvore
     private Node searchNode(int value) {
